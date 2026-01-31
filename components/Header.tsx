@@ -1,16 +1,20 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from '../types';
 import { supabase } from '../supabase';
 import { LogOut } from 'lucide-react';
+import { Session } from '@supabase/supabase-js';
 
 interface HeaderProps {
   currentView: View;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  session: Session | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode, session }) => {
+  const [role, setRole] = useState<string>('Carregando...');
+
   const titles: Record<View, string> = {
     dashboard: 'Visão Geral do Estoque',
     products: 'Catálogo de Produtos',
@@ -21,6 +25,26 @@ const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode
     suppliers: 'Gestão de Fornecedores',
     inventory: 'Monitoramento de Estoque'
   };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (session?.user?.id) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (data && !error) {
+          setRole(data.role);
+        } else {
+          setRole('Usuário');
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [session]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -48,11 +72,6 @@ const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode
           <span className="material-symbols-outlined">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
         </button>
 
-        <button className="relative p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors" title="Notificações">
-          <span className="material-symbols-outlined">notifications</span>
-          <span className="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-        </button>
-
         <button
           onClick={handleSignOut}
           className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
@@ -65,8 +84,10 @@ const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode
 
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Usuário Admin</p>
-            <p className="text-[10px] uppercase font-bold text-slate-400">Coordenador</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+              {session?.user?.email || 'Usuário'}
+            </p>
+            <p className="text-[10px] uppercase font-bold text-slate-400">{role}</p>
           </div>
           <div
             className="size-10 rounded-full bg-cover bg-center border-2 border-slate-200 dark:border-slate-700 shadow-sm"

@@ -72,6 +72,7 @@ const App: React.FC = () => {
           currentView={currentView}
           isDarkMode={isDarkMode}
           toggleDarkMode={toggleDarkMode}
+          session={session}
         />
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
