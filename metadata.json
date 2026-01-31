@@ -1,0 +1,6 @@
+
+{
+  "name": "EduEstoque Pro",
+  "description": "Um sistema abrangente de gestão de inventário escolar com análises de painel, rastreamento de entrada/saída de estoque, relatórios detalhados e controle de acesso baseado em funções.",
+  "requestFramePermissions": []
+}
