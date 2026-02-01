@@ -10,9 +10,10 @@ interface HeaderProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   session: Session | null;
+  onMenuClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode, session }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode, session, onMenuClick }) => {
   const [role, setRole] = useState<string>('Carregando...');
 
   const titles: Record<View, string> = {
@@ -51,10 +52,18 @@ const Header: React.FC<HeaderProps> = ({ currentView, isDarkMode, toggleDarkMode
   };
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 py-4 transition-colors">
-      <div className="flex items-center gap-8">
-        <h2 className="text-slate-900 dark:text-white text-xl font-bold tracking-tight">{titles[currentView]}</h2>
-        <div className="hidden md:flex relative items-center">
+    <header className="sticky top-0 z-20 flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-8 py-4 transition-colors">
+      <div className="flex items-center gap-4 md:gap-8">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+        <h2 className="text-slate-900 dark:text-white text-lg md:text-xl font-bold tracking-tight truncate max-w-[150px] md:max-w-none">
+          {titles[currentView]}
+        </h2>
+        <div className="hidden lg:flex relative items-center">
           <span className="absolute left-3 text-slate-400 material-symbols-outlined text-lg">search</span>
           <input
             className="w-72 pl-10 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white placeholder:text-slate-500"

@@ -273,52 +273,54 @@ const Products: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-slate-50 dark:bg-slate-800/50">
-                    <tr>
-                      <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Código SKU</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome do Produto</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Unidade</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Estoque Mín.</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {products.map((product) => (
-                      <tr key={product.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${editingProduct?.id === product.id ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}`}>
-                        <td className="px-6 py-4 text-xs font-black text-primary font-mono">{product.sku}</td>
-                        <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-slate-200">{product.name}</td>
-                        <td className="px-6 py-4">
-                          <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
-                            {product.category}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-center text-slate-500 font-bold">{product.unit}</td>
-                        <td className="px-6 py-4 text-sm text-right font-black text-slate-900 dark:text-white">{product.min_stock}</td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex justify-center gap-2">
-                            <button
-                              onClick={() => handleEdit(product)}
-                              className={`p-1.5 rounded-lg transition-all ${editingProduct?.id === product.id ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary'}`}
-                              title="Editar produto"
-                            >
-                              <span className="material-symbols-outlined text-lg">edit</span>
-                            </button>
-                            <button
-                              onClick={() => handleDelete(product.id)}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-500 transition-all"
-                              title="Excluir produto"
-                            >
-                              <span className="material-symbols-outlined text-lg">delete</span>
-                            </button>
-                          </div>
-                        </td>
+              <div className="overflow-x-auto w-full">
+                <div className="min-w-[800px] lg:min-w-0">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-50 dark:bg-slate-800/50">
+                      <tr>
+                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Código SKU</th>
+                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome do Produto</th>
+                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</th>
+                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Unidade</th>
+                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Estoque Mín.</th>
+                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ações</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {products.map((product) => (
+                        <tr key={product.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${editingProduct?.id === product.id ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}`}>
+                          <td className="px-6 py-4 text-xs font-black text-primary font-mono">{product.sku}</td>
+                          <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-slate-200">{product.name}</td>
+                          <td className="px-6 py-4">
+                            <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-center text-slate-500 font-bold">{product.unit}</td>
+                          <td className="px-6 py-4 text-sm text-right font-black text-slate-900 dark:text-white">{product.min_stock}</td>
+                          <td className="px-6 py-4 text-center">
+                            <div className="flex justify-center gap-2">
+                              <button
+                                onClick={() => handleEdit(product)}
+                                className={`p-1.5 rounded-lg transition-all ${editingProduct?.id === product.id ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary'}`}
+                                title="Editar produto"
+                              >
+                                <span className="material-symbols-outlined text-lg">edit</span>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(product.id)}
+                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-500 transition-all"
+                                title="Excluir produto"
+                              >
+                                <span className="material-symbols-outlined text-lg">delete</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
             <div className="p-6 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">

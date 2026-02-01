@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -65,7 +66,15 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
-      <Sidebar currentView={currentView} setView={setCurrentView} />
+      <Sidebar
+        currentView={currentView}
+        setView={(view) => {
+          setCurrentView(view);
+          setIsSidebarOpen(false);
+        }}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header
@@ -73,6 +82,7 @@ const App: React.FC = () => {
           isDarkMode={isDarkMode}
           toggleDarkMode={toggleDarkMode}
           session={session}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
