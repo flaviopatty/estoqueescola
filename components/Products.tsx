@@ -7,6 +7,7 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // Form state
   const [name, setName] = useState('');
@@ -36,6 +37,25 @@ const Products: React.FC = () => {
     }
   };
 
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setName(product.name);
+    setSku(product.sku);
+    setUnit(product.unit);
+    setCategory(product.category);
+    setMinStock(product.min_stock.toString());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetForm = () => {
+    setEditingProduct(null);
+    setName('');
+    setSku('');
+    setUnit('Unidade (un)');
+    setCategory('Informática');
+    setMinStock('0');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !sku) {
@@ -45,30 +65,33 @@ const Products: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const { error } = await supabase.from('products').insert([
-        {
-          name,
-          sku,
-          unit,
-          category,
-          min_stock: parseFloat(minStock) || 0,
-          status: 'ativo'
-        },
-      ]);
+      const productData = {
+        name,
+        sku,
+        unit,
+        category,
+        min_stock: parseFloat(minStock) || 0,
+        status: 'ativo'
+      };
 
-      if (error) throw error;
+      if (editingProduct) {
+        const { error } = await supabase
+          .from('products')
+          .update(productData)
+          .eq('id', editingProduct.id);
 
-      // Clear form
-      setName('');
-      setSku('');
-      setUnit('Unidade (un)');
-      setCategory('Informática');
-      setMinStock('0');
+        if (error) throw error;
+        alert('Produto atualizado com sucesso!');
+      } else {
+        const { error } = await supabase.from('products').insert([productData]);
+        if (error) throw error;
+        alert('Produto cadastrado com sucesso!');
+      }
 
-      // Refresh list
+      resetForm();
       fetchProducts();
     } catch (error: any) {
-      alert('Erro ao cadastrar produto: ' + error.message);
+      alert('Erro ao processar produto: ' + error.message);
     } finally {
       setSubmitting(false);
     }
@@ -93,12 +116,18 @@ const Products: React.FC = () => {
         {/* Formulário de Cadastro */}
         <div className="xl:col-span-1 space-y-6">
           <div className="flex items-center gap-3 px-1">
-            <div className="size-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="material-symbols-outlined text-2xl font-black">library_add</span>
+            <div className={`size-12 rounded-2xl ${editingProduct ? 'bg-amber-500' : 'bg-primary'} text-white flex items-center justify-center shadow-lg transition-colors`}>
+              <span className="material-symbols-outlined text-2xl font-black">
+                {editingProduct ? 'edit_note' : 'library_add'}
+              </span>
             </div>
             <div>
-              <h2 className="text-slate-900 dark:text-white text-xl font-black">Novo Produto</h2>
-              <p className="text-slate-500 text-xs font-medium">Defina os itens do catálogo mestre</p>
+              <h2 className="text-slate-900 dark:text-white text-xl font-black">
+                {editingProduct ? 'Editar Produto' : 'Novo Produto'}
+              </h2>
+              <p className="text-slate-500 text-xs font-medium">
+                {editingProduct ? `Editando: ${editingProduct.sku}` : 'Defina os itens do catálogo mestre'}
+              </p>
             </div>
           </div>
 
@@ -174,25 +203,19 @@ const Products: React.FC = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-primary text-white font-black uppercase text-xs tracking-widest h-12 rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50"
+                  className={`w-full ${editingProduct ? 'bg-amber-500 hover:bg-amber-600' : 'bg-primary hover:bg-primary/90'} text-white font-black uppercase text-xs tracking-widest h-12 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50`}
                 >
                   <span className="material-symbols-outlined text-lg">
-                    {submitting ? 'sync' : 'check_circle'}
+                    {submitting ? 'sync' : (editingProduct ? 'save' : 'check_circle')}
                   </span>
-                  {submitting ? 'Cadastrando...' : 'Cadastrar no Catálogo'}
+                  {submitting ? (editingProduct ? 'Salvando...' : 'Cadastrando...') : (editingProduct ? 'Salvar Alterações' : 'Cadastrar no Catálogo')}
                 </button>
                 <button
                   className="w-full border border-slate-200 dark:border-slate-800 dark:text-white font-black uppercase text-[10px] tracking-widest h-10 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-                  type="reset"
-                  onClick={() => {
-                    setName('');
-                    setSku('');
-                    setUnit('Unidade (un)');
-                    setCategory('Informática');
-                    setMinStock('0');
-                  }}
+                  type="button"
+                  onClick={resetForm}
                 >
-                  Limpar
+                  {editingProduct ? 'Cancelar Edição' : 'Limpar'}
                 </button>
               </div>
             </form>
@@ -264,7 +287,7 @@ const Products: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {products.map((product) => (
-                      <tr key={product.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                      <tr key={product.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${editingProduct?.id === product.id ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}`}>
                         <td className="px-6 py-4 text-xs font-black text-primary font-mono">{product.sku}</td>
                         <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-slate-200">{product.name}</td>
                         <td className="px-6 py-4">
@@ -276,12 +299,17 @@ const Products: React.FC = () => {
                         <td className="px-6 py-4 text-sm text-right font-black text-slate-900 dark:text-white">{product.min_stock}</td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex justify-center gap-2">
-                            <button className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-primary transition-all">
+                            <button
+                              onClick={() => handleEdit(product)}
+                              className={`p-1.5 rounded-lg transition-all ${editingProduct?.id === product.id ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary'}`}
+                              title="Editar produto"
+                            >
                               <span className="material-symbols-outlined text-lg">edit</span>
                             </button>
                             <button
                               onClick={() => handleDelete(product.id)}
                               className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-500 transition-all"
+                              title="Excluir produto"
                             >
                               <span className="material-symbols-outlined text-lg">delete</span>
                             </button>
