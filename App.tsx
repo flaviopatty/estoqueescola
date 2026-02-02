@@ -19,20 +19,65 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [isFetchingPermissions, setIsFetchingPermissions] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) fetchPermissions(session.user.id);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) fetchPermissions(session.user.id);
+      else setUserPermissions([]);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchPermissions = async (userId: string) => {
+    try {
+      setIsFetchingPermissions(true);
+      // 1. Pegar o cargo do usuário no perfil
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+      if (profileError || !profile) throw profileError;
+
+      // 2. Se for Administrador e não tiver registro na tabela roles, dar permissão total
+      if (profile.role === 'Administrador') {
+        const fullPermissions = ['dashboard', 'products', 'entries', 'exits', 'reports', 'admin', 'suppliers', 'inventory'];
+        setUserPermissions(fullPermissions);
+        return;
+      }
+
+      // 3. Pegar as permissões do cargo na tabela roles
+      const { data: roleData, error: roleError } = await supabase
+        .from('roles')
+        .select('permissions')
+        .eq('name', profile.role)
+        .single();
+
+      if (roleError) {
+        console.warn('Permissões não encontradas para o cargo:', profile.role);
+        setUserPermissions(['dashboard']); // Mínimo acesso
+      } else {
+        setUserPermissions(roleData.permissions || ['dashboard']);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar permissões:', error);
+      setUserPermissions(['dashboard']);
+    } finally {
+      setIsFetchingPermissions(false);
+    }
+  };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -40,6 +85,25 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
+    // Se ainda está carregando permissões, mostra loading
+    if (isFetchingPermissions) {
+      return (
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <span className="material-symbols-outlined animate-spin text-primary text-4xl">sync</span>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Validando Acessos...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Se o usuário não tem permissão para a view atual, redireciona para a primeira permitida ou dashboard
+    if (userPermissions.length > 0 && !userPermissions.includes(currentView)) {
+      const fallbackView = userPermissions[0] as View;
+      setCurrentView(fallbackView);
+      return null;
+    }
+
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
@@ -74,6 +138,7 @@ const App: React.FC = () => {
         }}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
+        permissions={userPermissions}
       />
 
       <main className="flex-1 flex flex-col overflow-hidden">

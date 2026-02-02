@@ -108,12 +108,13 @@ const Admin: React.FC = () => {
   };
 
   const permissions = [
-    { name: 'Painel', desc: 'Visualizar status geral do inventário e alertas.' },
-    { id: 'inventory_p', name: 'Estoque', desc: 'Monitorar níveis, validades e status dos itens.' },
-    { id: 'entry_p', name: 'Entradas', desc: 'Registrar novos itens e chegada de estoque.' },
-    { id: 'exit_p', name: 'Saídas', desc: 'Processar retiradas e distribuição de itens.' },
-    { name: 'Relatórios', desc: 'Gerar auditorias e exportar planilhas de dados.' },
-    { name: 'Admin', desc: 'Gerenciar usuários, funções e config. do sistema.' },
+    { id: 'dashboard', name: 'Painel', desc: 'Visualizar status geral do inventário e alertas.' },
+    { id: 'inventory', name: 'Estoque', desc: 'Monitorar níveis, validades e status dos itens.' },
+    { id: 'products', name: 'Produtos', desc: 'Gerenciar catálogo e especificações dos materiais.' },
+    { id: 'entries', name: 'Entradas', desc: 'Registrar novos itens e chegada de estoque.' },
+    { id: 'exits', name: 'Saídas', desc: 'Processar retiradas e distribuição de itens.' },
+    { id: 'reports', name: 'Relatórios', desc: 'Gerar auditorias e exportar planilhas de dados.' },
+    { id: 'admin', name: 'Admin', desc: 'Gerenciar usuários, funções e config. do sistema.' },
   ];
 
   return (
@@ -127,10 +128,7 @@ const Admin: React.FC = () => {
           <h2 className="text-slate-900 dark:text-white text-3xl font-black tracking-tight">Permissões do Sistema</h2>
           <p className="text-slate-500 font-medium text-sm mt-1">Gerenciar controles de acesso institucional</p>
         </div>
-        <button className="flex h-12 items-center justify-center rounded-xl bg-primary px-6 text-white font-black text-xs uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-          <span className="material-symbols-outlined mr-2 text-[18px]">person_add</span>
-          Adicionar Membro da Equipe
-        </button>
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -262,12 +260,12 @@ const Admin: React.FC = () => {
                         <input
                           className="mt-1 rounded-lg text-primary focus:ring-4 focus:ring-primary/10 h-5 w-5 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 transition-all"
                           type="checkbox"
-                          checked={selectedPermissions.includes(perm.name)}
+                          checked={selectedPermissions.includes(perm.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedPermissions([...selectedPermissions, perm.name]);
+                              setSelectedPermissions([...selectedPermissions, perm.id]);
                             } else {
-                              setSelectedPermissions(selectedPermissions.filter(p => p !== perm.name));
+                              setSelectedPermissions(selectedPermissions.filter(p => p !== perm.id));
                             }
                           }}
                         />

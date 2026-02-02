@@ -7,10 +7,11 @@ interface SidebarProps {
   setView: (view: View) => void;
   isOpen: boolean;
   onClose: () => void;
+  permissions: string[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, onClose }) => {
-  const navItems: { id: View; label: string; icon: string }[] = [
+const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, onClose, permissions }) => {
+  const allNavItems: { id: View; label: string; icon: string }[] = [
     { id: 'dashboard', label: 'Painel Principal', icon: 'dashboard' },
     { id: 'inventory', label: 'Estoque', icon: 'box' },
     { id: 'products', label: 'Produtos', icon: 'inventory' },
@@ -19,6 +20,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, onClose
     { id: 'reports', label: 'Relatórios', icon: 'analytics' },
     { id: 'admin', label: 'Administração', icon: 'security' },
   ];
+
+  const navItems = allNavItems.filter(item => permissions.includes(item.id));
 
   return (
     <>
@@ -70,15 +73,17 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, onClose
           </nav>
         </div>
 
-        <div className="mt-auto p-6 border-t border-slate-100 dark:border-slate-800">
-          <button
-            onClick={() => setView('products')}
-            className="w-full flex items-center justify-center gap-2 rounded-xl h-11 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-          >
-            <span className="material-symbols-outlined text-[20px]">library_add</span>
-            <span>Novo Produto</span>
-          </button>
-        </div>
+        {permissions.includes('products') && (
+          <div className="mt-auto p-6 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => setView('products')}
+              className="w-full flex items-center justify-center gap-2 rounded-xl h-11 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              <span className="material-symbols-outlined text-[20px]">library_add</span>
+              <span>Novo Produto</span>
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );
