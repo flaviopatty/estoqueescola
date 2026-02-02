@@ -10,6 +10,7 @@ import Exits from './components/Exits';
 import Reports from './components/Reports';
 import Admin from './components/Admin';
 import Inventory from './components/Inventory';
+import Suppliers from './components/Suppliers';
 import Auth from './components/Auth';
 import { supabase } from './supabase';
 import { Session } from '@supabase/supabase-js';
@@ -119,6 +120,8 @@ const App: React.FC = () => {
         return <Admin />;
       case 'inventory':
         return <Inventory />;
+      case 'suppliers':
+        return <Suppliers />;
       default:
         return <Dashboard />;
     }

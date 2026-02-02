@@ -114,6 +114,7 @@ const Admin: React.FC = () => {
     { id: 'entries', name: 'Entradas', desc: 'Registrar novos itens e chegada de estoque.' },
     { id: 'exits', name: 'Saídas', desc: 'Processar retiradas e distribuição de itens.' },
     { id: 'reports', name: 'Relatórios', desc: 'Gerar auditorias e exportar planilhas de dados.' },
+    { id: 'suppliers', name: 'Fornecedores', desc: 'Gerenciar catálogo de fornecedores e contatos.' },
     { id: 'admin', name: 'Admin', desc: 'Gerenciar usuários, funções e config. do sistema.' },
   ];
 

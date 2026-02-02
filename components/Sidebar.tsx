@@ -18,6 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, onClose
     { id: 'entries', label: 'Entradas', icon: 'add_circle' },
     { id: 'exits', label: 'Saídas', icon: 'do_not_disturb_on' },
     { id: 'reports', label: 'Relatórios', icon: 'analytics' },
+    { id: 'suppliers', label: 'Fornecedores', icon: 'local_shipping' },
     { id: 'admin', label: 'Administração', icon: 'security' },
   ];
 
